@@ -69,9 +69,13 @@ Demo is coming soon within these days. Please keep tuned! 🔥
 3. Download the pre-trained models using one of the following options:
 
    **Option A: Original Model Format (config-based)**
+   
    Download from [Baidu Yun](https://pan.baidu.com/s/1EbjjTN_lUinCq7tX7hhtfQ?pwd=wb43) or [Google Drive](https://drive.google.com/drive/folders/1PQJ3UutepXvunizZEw-uGaQ0BCzf-mie?usp=sharing) and put them in the `./checkpoints` folder.
 
    **Option B: Hugging Face Model Format**
+   
+   Visit our Huggingface [link](https://github.com/bytedance/Dolphin), or download model by:
+   
    ```bash
    # Download the model from Hugging Face Hub
    git lfs install
