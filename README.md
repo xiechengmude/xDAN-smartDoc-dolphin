@@ -74,7 +74,7 @@ Demo is coming soon within these days. Please keep tuned! 🔥
 
    **Option B: Hugging Face Model Format**
    
-   Visit our Huggingface [link](https://github.com/bytedance/Dolphin), or download model by:
+   Visit our Huggingface [model card](https://huggingface.co/ByteDance/Dolphin), or download model by:
    
    ```bash
    # Download the model from Hugging Face Hub
