@@ -52,6 +52,7 @@ Demo is coming soon within these days. Please keep tuned! 🔥
 
 ## 📅 Changelog
 - 🔥 **2025.05.20** The pretrained model and inference code of Dolphin are released.
+- 🔥 **2025.05.16** Our paper has been accepted by ACL 2025. Paper link: [Arxiv](https://arxiv.org/abs/2505.14059).
 
 ## 🛠️ Installation
 
