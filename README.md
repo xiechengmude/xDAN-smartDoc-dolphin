@@ -178,3 +178,7 @@ If you find this code useful for your research, please use the following BibTeX 
   booktitle={Proceedings of the 65rd Annual Meeting of the Association for Computational Linguistics (ACL)}
 }
 ```
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=bytedance/Dolphin&type=Date)](https://www.star-history.com/#bytedance/Dolphin&Date)
