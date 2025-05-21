@@ -9,9 +9,9 @@
   <a href="https://huggingface.co/ByteDance/Dolphin">
     <img src="https://img.shields.io/badge/HuggingFace-Dolphin-yellow">
   </a>
-  <!-- <a href="https://link/of/demo">
-    <img src="https://img.shields.io/badge/Demo-Coming_Soon-blue">
-  </a> -->
+  <a href="http://115.190.42.15:8888/dolphin/">
+    <img src="https://img.shields.io/badge/Demo-Dolphin-blue">
+  </a>
   <a href="https://github.com/bytedance/Dolphin">
     <img src="https://img.shields.io/badge/Code-Github-green">
   </a>
@@ -46,11 +46,11 @@ Dolphin achieves promising performance across diverse page-level and element-lev
 
 ## 🚀 Demo
 
-<!-- Try our demo on [GitHub](https://github.com/ByteDance/Dolphin). -->
-Demo is coming soon within these days. Please keep tuned! 🔥
+Try our demo on [Demo-Dolphin](http://115.190.42.15:8888/dolphin/).
 
 
 ## 📅 Changelog
+- 🔥 **2025.05.21** Our demo is released at [link](http://115.190.42.15:8888/dolphin/). Check it out!
 - 🔥 **2025.05.20** The pretrained model and inference code of Dolphin are released.
 - 🔥 **2025.05.16** Our paper has been accepted by ACL 2025. Paper link: [arXiv](https://arxiv.org/abs/2505.14059).
 
