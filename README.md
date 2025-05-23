@@ -156,6 +156,10 @@ python demo_element_hf.py --model_path ./hf_model --input_path ./demo/element_im
 - ⏱️ Efficient parallel parsing mechanism
 - 🤗 Support for Hugging Face Transformers for easier integration
 
+
+## 📮 Notice
+**Call for Bad Cases:** If you have encountered any cases where the model performs poorly, we would greatly appreciate it if you could share them in the issue.
+
 ## 💖 Acknowledgement
 
 We would like to acknowledge the following open-source projects that provided inspiration and reference for this work:
