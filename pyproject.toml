@@ -1,3 +1,91 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xdan-smartdoc-dolphin"
+version = "1.0.0"
+description = "High-performance concurrent asynchronous intelligent document recognition system based on Dolphin"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "albumentations==1.4.0",
+    "numpy==1.24.4",
+    "omegaconf==2.3.0",
+    "opencv-python==4.11.0.86",
+    "opencv-python-headless==4.5.5.64",
+    "pillow==9.3.0",
+    "timm==0.5.4",
+    "torch==2.1.0",
+    "torchvision==0.16.0",
+    "transformers==4.47.0",
+    "accelerate==1.6.0",
+    # Additional dependencies for high-performance async system
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "aiofiles>=23.2.0",
+    "asyncio-mqtt>=0.16.0",
+    "redis>=5.0.0",
+    "celery>=5.3.0",
+    "pydantic>=2.5.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.12.0",
+    "httpx>=0.25.0",
+    "websockets>=12.0",
+    "prometheus-client>=0.19.0",
+    "structlog>=23.2.0",
+    "typer>=0.9.0",
+    "python-multipart>=0.0.6",
+    "motor>=3.3.0",  # Async MongoDB driver
+    "aiobotocore>=2.7.0",  # Async AWS S3 client
+    "aioredis>=2.0.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.9.0",
+    "isort>=5.12.0",
+    "mypy>=1.6.0",
+    "pre-commit>=3.5.0",
+    "ruff>=0.1.0",
+]
+
+monitoring = [
+    "grafana-client>=3.6.0",
+    "elasticsearch>=8.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/xDAN-smartDoc-dolphin"
+Repository = "https://github.com/yourusername/xDAN-smartDoc-dolphin"
+Documentation = "https://xdan-smartdoc-dolphin.readthedocs.io"
+
+[project.scripts]
+smartdoc-server = "src.api.main:app"
+smartdoc-worker = "src.worker.main:main"
+smartdoc-cli = "src.cli.main:app"
+
 [tool.black]
 line-length = 120
 include = '\.pyi?$'
@@ -14,3 +102,28 @@ exclude = '''
   | dist
 )/
 '''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I", "N", "UP", "YTT", "S", "BLE", "FBT", "B", "A", "COM", "C4", "DTZ", "T10", "DJ", "EM", "EXE", "FA", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "TD", "FIX", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "FURB", "LOG", "RUF"]
+ignore = ["E501", "S101", "S311", "PLR0913", "PLR2004", "PLR0915"]

@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xDAN-Vision-SmartDoc 智能文档识别</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #007acc, #4a90e2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .card-body {
+            padding: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed #007acc;
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            background: #f8fafc;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #4a90e2;
+            background: #f0f7ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #007acc;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option-group {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .option-group h3 {
+            color: #007acc;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .process-btn {
+            background: linear-gradient(135deg, #007acc, #4a90e2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,122,204,0.3);
+            width: 100%;
+        }
+
+        .process-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,122,204,0.4);
+        }
+
+        .process-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007acc;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-header {
+            background: #28a745;
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+
+        .result-body {
+            background: white;
+            border: 2px solid #28a745;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 30px;
+        }
+
+        .result-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #007acc;
+            border-bottom-color: #007acc;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007acc;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .content-display {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #f5c6cb;
+            margin-top: 20px;
+        }
+
+        .file-preview {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .file-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007acc, #4a90e2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card-body {
+                padding: 20px;
+            }
+            
+            .upload-area {
+                padding: 40px 20px;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="header">
+            <h1>🔬 xDAN-Vision-SmartDoc</h1>
+            <p class="subtitle">基于xDAN 高性能多模态模型的智能文档识别系统</p>
+        </div>
+
+        <!-- 主操作区域 -->
+        <div class="main-card">
+            <div class="card-header">
+                <h2>📄 上传文档开始识别</h2>
+                <p>支持PNG、JPG、JPEG格式，自动识别文本、表格、图表和公式</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- 文件上传区域 -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">点击选择文件或拖拽文件到此处</div>
+                    <div class="upload-hint">支持 PNG, JPG, JPEG 格式，建议分辨率 ≥ 300 DPI</div>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                </div>
+
+                <!-- 文件预览 -->
+                <div class="file-preview" id="filePreview" style="display: none;">
+                    <h3>📸 文件预览</h3>
+                    <img id="previewImage" src="" alt="文件预览">
+                    <p id="fileInfo"></p>
+                </div>
+
+                <!-- 处理选项 -->
+                <div class="options-grid">
+                    <div class="option-group">
+                        <h3>🎨 输出格式</h3>
+                        <div class="form-group">
+                            <label for="outputFormat">选择格式:</label>
+                            <select id="outputFormat" class="form-control">
+                                <option value="structured">结构化 (包含所有格式)</option>
+                                <option value="json">JSON (程序处理)</option>
+                                <option value="markdown">Markdown (文档编辑)</option>
+                                <option value="html">HTML (网页显示)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <h3>⚙️ 处理参数</h3>
+                        <div class="form-group">
+                            <label for="batchSize">批处理大小:</label>
+                            <select id="batchSize" class="form-control">
+                                <option value="4">4 (高精度)</option>
+                                <option value="8">8 (平衡)</option>
+                                <option value="16" selected>16 (推荐)</option>
+                                <option value="32">32 (快速)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <h3>📊 输出选项</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="includeConfidence" checked>
+                            <label for="includeConfidence">包含置信度</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="includeCoordinates" checked>
+                            <label for="includeCoordinates">包含坐标信息</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="mergeTextBlocks" checked>
+                            <label for="mergeTextBlocks">合并相邻文本</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 处理按钮 -->
+                <button class="process-btn" id="processBtn" disabled>
+                    🚀 开始智能识别
+                </button>
+
+                <!-- 加载动画 -->
+                <div class="loading" id="loadingDiv">
+                    <div class="spinner"></div>
+                    <p>正在处理文档，请稍候...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <!-- 结果显示 -->
+                <div class="result-section" id="resultSection">
+                    <div class="result-header">
+                        <h2>✅ 识别完成</h2>
+                        <p id="resultSummary"></p>
+                    </div>
+                    
+                    <div class="result-body">
+                        <!-- 统计信息 -->
+                        <div class="result-stats" id="resultStats">
+                            <!-- 动态生成统计卡片 -->
+                        </div>
+
+                        <!-- 结果标签页 -->
+                        <div class="result-tabs">
+                            <button class="tab-btn active" data-tab="elements">识别元素</button>
+                            <button class="tab-btn" data-tab="markdown">Markdown</button>
+                            <button class="tab-btn" data-tab="html">HTML预览</button>
+                            <button class="tab-btn" data-tab="json">JSON数据</button>
+                        </div>
+
+                        <!-- 标签页内容 -->
+                        <div class="tab-content active" id="tab-elements">
+                            <div id="elementsDisplay"></div>
+                        </div>
+
+                        <div class="tab-content" id="tab-markdown">
+                            <div style="margin-bottom: 15px;">
+                                <button class="download-btn" onclick="downloadContent('markdown')">
+                                    📥 下载 Markdown
+                                </button>
+                            </div>
+                            <div class="content-display" id="markdownDisplay"></div>
+                        </div>
+
+                        <div class="tab-content" id="tab-html">
+                            <div style="margin-bottom: 15px;">
+                                <button class="download-btn" onclick="downloadContent('html')">
+                                    📥 下载 HTML
+                                </button>
+                                <button class="download-btn" onclick="previewHTML()">
+                                    👁️ 新窗口预览
+                                </button>
+                            </div>
+                            <div class="content-display" id="htmlDisplay"></div>
+                        </div>
+
+                        <div class="tab-content" id="tab-json">
+                            <div style="margin-bottom: 15px;">
+                                <button class="download-btn" onclick="downloadContent('json')">
+                                    📥 下载 JSON
+                                </button>
+                            </div>
+                            <div class="content-display" id="jsonDisplay"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 错误消息 -->
+                <div class="error-message" id="errorMessage" style="display: none;">
+                    <strong>❌ 处理失败:</strong>
+                    <span id="errorText"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="main-card">
+            <div class="card-header">
+                <h2>📚 使用说明</h2>
+            </div>
+            <div class="card-body">
+                <div class="options-grid">
+                    <div class="option-group">
+                        <h3>🔍 支持识别</h3>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>📝 文本内容 (OCR)</li>
+                            <li>📊 表格结构</li>
+                            <li>🖼️ 图表分析</li>
+                            <li>🧮 数学公式</li>
+                        </ul>
+                    </div>
+                    <div class="option-group">
+                        <h3>⚡ 性能建议</h3>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>小文档: 批处理32</li>
+                            <li>大文档: 批处理8</li>
+                            <li>高精度: 批处理4</li>
+                            <li>快速扫描: 批处理64</li>
+                        </ul>
+                    </div>
+                    <div class="option-group">
+                        <h3>🎯 最佳实践</h3>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>分辨率 ≥ 300 DPI</li>
+                            <li>图像清晰无模糊</li>
+                            <li>对比度适中</li>
+                            <li>文字大小适中</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let selectedFile = null;
+        let processingResult = null;
+
+        // DOM 元素
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const filePreview = document.getElementById('filePreview');
+        const previewImage = document.getElementById('previewImage');
+        const fileInfo = document.getElementById('fileInfo');
+        const processBtn = document.getElementById('processBtn');
+        const loadingDiv = document.getElementById('loadingDiv');
+        const resultSection = document.getElementById('resultSection');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // 初始化事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            checkServerStatus();
+        });
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 文件上传相关
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // 处理按钮
+            processBtn.addEventListener('click', processDocument);
+
+            // 标签页切换
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+        }
+
+        // 检查服务器状态
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                console.log('Server status:', data.status);
+            } catch (error) {
+                showError('无法连接到服务器，请确保API服务已启动');
+            }
+        }
+
+        // 拖拽处理
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        // 文件选择处理
+        function handleFileSelect(e) {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        }
+
+        // 处理选中的文件
+        function handleFile(file) {
+            // 验证文件类型
+            if (!file.type.startsWith('image/')) {
+                showError('请选择图像文件 (PNG, JPG, JPEG)');
+                return;
+            }
+
+            selectedFile = file;
+
+            // 显示文件预览
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                fileInfo.textContent = `文件名: ${file.name} | 大小: ${formatFileSize(file.size)} | 类型: ${file.type}`;
+                filePreview.style.display = 'block';
+                processBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+
+            hideError();
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 处理文档
+        async function processDocument() {
+            if (!selectedFile) {
+                showError('请先选择文件');
+                return;
+            }
+
+            // 显示加载动画
+            showLoading();
+            hideError();
+            resultSection.style.display = 'none';
+
+            // 模拟进度
+            simulateProgress();
+
+            try {
+                // 准备表单数据
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                formData.append('output_format', document.getElementById('outputFormat').value);
+                formData.append('max_batch_size', document.getElementById('batchSize').value);
+                formData.append('include_confidence', document.getElementById('includeConfidence').checked);
+                formData.append('include_coordinates', document.getElementById('includeCoordinates').checked);
+                formData.append('merge_text_blocks', document.getElementById('mergeTextBlocks').checked);
+
+                // 发送请求
+                const response = await fetch('/api/process/document', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+                processingResult = result;
+
+                // 显示结果
+                displayResults(result);
+
+            } catch (error) {
+                console.error('Processing error:', error);
+                showError(error.message || '处理文档时发生错误');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 显示加载状态
+        function showLoading() {
+            loadingDiv.style.display = 'block';
+            processBtn.disabled = true;
+        }
+
+        // 隐藏加载状态
+        function hideLoading() {
+            loadingDiv.style.display = 'none';
+            processBtn.disabled = false;
+            document.getElementById('progressFill').style.width = '0%';
+        }
+
+        // 模拟进度条
+        function simulateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 90) {
+                    progress = 90;
+                    clearInterval(interval);
+                }
+                progressFill.style.width = progress + '%';
+            }, 500);
+
+            // 在请求完成时清理
+            setTimeout(() => {
+                clearInterval(interval);
+                progressFill.style.width = '100%';
+            }, 10000);
+        }
+
+        // 显示结果
+        function displayResults(result) {
+            // 更新摘要
+            document.getElementById('resultSummary').textContent = 
+                `识别到 ${result.total_elements} 个元素，耗时 ${result.processing_time.toFixed(2)} 秒`;
+
+            // 更新统计信息
+            displayStats(result);
+
+            // 显示各个标签页的内容
+            displayElements(result.elements || []);
+            
+            if (result.markdown_content) {
+                document.getElementById('markdownDisplay').textContent = result.markdown_content;
+            }
+            
+            if (result.html_content) {
+                document.getElementById('htmlDisplay').textContent = result.html_content;
+            }
+            
+            document.getElementById('jsonDisplay').textContent = JSON.stringify(result, null, 2);
+
+            // 显示结果区域
+            resultSection.style.display = 'block';
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 显示统计信息
+        function displayStats(result) {
+            const statsContainer = document.getElementById('resultStats');
+            const elements = result.elements || [];
+            
+            // 统计元素类型
+            const elementTypes = {};
+            let totalConfidence = 0;
+            let confidenceCount = 0;
+
+            elements.forEach(elem => {
+                elementTypes[elem.type] = (elementTypes[elem.type] || 0) + 1;
+                if (elem.confidence !== null && elem.confidence !== undefined) {
+                    totalConfidence += elem.confidence;
+                    confidenceCount++;
+                }
+            });
+
+            const avgConfidence = confidenceCount > 0 ? (totalConfidence / confidenceCount) : 0;
+
+            // 生成统计卡片
+            const stats = [
+                { label: '总元素数', value: result.total_elements },
+                { label: '处理时间', value: `${result.processing_time.toFixed(2)}s` },
+                { label: '平均置信度', value: `${(avgConfidence * 100).toFixed(1)}%` },
+                { label: '文件大小', value: formatFileSize(selectedFile.size) }
+            ];
+
+            statsContainer.innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="stat-value">${stat.value}</div>
+                    <div class="stat-label">${stat.label}</div>
+                </div>
+            `).join('');
+        }
+
+        // 显示识别元素
+        function displayElements(elements) {
+            const container = document.getElementById('elementsDisplay');
+            
+            if (elements.length === 0) {
+                container.innerHTML = '<p>未识别到任何元素</p>';
+                return;
+            }
+
+            const elementsHtml = elements.map((elem, index) => {
+                const confidenceColor = elem.confidence >= 0.8 ? '#28a745' : 
+                                       elem.confidence >= 0.5 ? '#ffc107' : '#dc3545';
+                
+                return `
+                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: bold; color: #007acc;">
+                                ${getElementTypeIcon(elem.type)} ${elem.type.toUpperCase()}
+                            </span>
+                            ${elem.confidence !== null ? `
+                                <span style="background: ${confidenceColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">
+                                    ${(elem.confidence * 100).toFixed(1)}%
+                                </span>
+                            ` : ''}
+                        </div>
+                        <div style="background: #f8fafc; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
+                            <pre style="white-space: pre-wrap; margin: 0; font-family: inherit;">${elem.text || '(无文本内容)'}</pre>
+                        </div>
+                        ${elem.bbox ? `
+                            <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                                📍 坐标: [${elem.bbox.map(n => n.toFixed(1)).join(', ')}]
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = elementsHtml;
+        }
+
+        // 获取元素类型图标
+        function getElementTypeIcon(type) {
+            const icons = {
+                'text': '📝',
+                'table': '📊',
+                'figure': '🖼️',
+                'formula': '🧮',
+                'chart': '📈',
+                'diagram': '🗺️'
+            };
+            return icons[type] || '📄';
+        }
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 更新按钮状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // 更新内容显示
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // 下载内容
+        function downloadContent(format) {
+            if (!processingResult) return;
+
+            let content = '';
+            let filename = '';
+            let mimeType = '';
+
+            switch (format) {
+                case 'markdown':
+                    content = processingResult.markdown_content || '';
+                    filename = 'document_result.md';
+                    mimeType = 'text/markdown';
+                    break;
+                case 'html':
+                    content = processingResult.html_content || '';
+                    filename = 'document_result.html';
+                    mimeType = 'text/html';
+                    break;
+                case 'json':
+                    content = JSON.stringify(processingResult, null, 2);
+                    filename = 'document_result.json';
+                    mimeType = 'application/json';
+                    break;
+            }
+
+            if (content) {
+                downloadFile(content, filename, mimeType);
+            }
+        }
+
+        // 预览HTML
+        function previewHTML() {
+            if (!processingResult || !processingResult.html_content) return;
+            
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(processingResult.html_content);
+            newWindow.document.close();
+        }
+
+        // 下载文件
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            errorMessage.style.display = 'block';
+            errorMessage.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html> 
