@@ -1,188 +1,293 @@
-<div align="center">
-  <img src="./assets/dolphin.png" width="300">
-</div>
+# 🔬 xDAN-Vision-SmartDoc 智能文档识别系统
 
-<div align="center">
-  <a href="https://arxiv.org/abs/2505.14059">
-    <img src="https://img.shields.io/badge/Paper-arXiv-red">
-  </a>
-  <a href="https://huggingface.co/ByteDance/Dolphin">
-    <img src="https://img.shields.io/badge/HuggingFace-Dolphin-yellow">
-  </a>
-  <a href="http://115.190.42.15:8888/dolphin/">
-    <img src="https://img.shields.io/badge/Demo-Dolphin-blue">
-  </a>
-  <a href="https://github.com/bytedance/Dolphin">
-    <img src="https://img.shields.io/badge/Code-Github-green">
-  </a>
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/License-MIT-lightgray">
-  </a>
-  <br>
-</div>
+**基于xDAN 高性能多模态模型的智能文档识别与解析系统**
 
-<br>
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)](https://fastapi.tiangolo.com)
 
-<div align="center">
-  <img src="./assets/demo.gif" width="800">
-</div>
+## ✨ 核心功能
 
-# Dolphin: Document Image Parsing via Heterogeneous Anchor Prompting
+- 📝 **OCR文本识别**: 高精度多语言文本识别
+- 📊 **表格解析**: 结构化表格识别与格式化
+- 🖼️ **图表分析**: 智能图表理解与描述
+- 🧮 **公式识别**: LaTeX格式数学公式识别
+- 🎨 **多格式输出**: JSON/Markdown/HTML/结构化输出
+- ⚡ **异步处理**: 高并发批量处理
+- 🌐 **Web界面**: 可视化文档处理界面
 
-Dolphin (**Do**cument Image **P**arsing via **H**eterogeneous Anchor Prompt**in**g) is a novel multimodal document image parsing model following an analyze-then-parse paradigm. This repository contains the demo code and pre-trained models for Dolphin.
+## 🚀 快速开始
 
-## 📑 Overview
+### 1. 环境要求
 
-Document image parsing is challenging due to its complexly intertwined elements such as text paragraphs, figures, formulas, and tables. Dolphin addresses these challenges through a two-stage approach:
+- Python 3.8+
+- CUDA (可选，用于GPU加速)
+- 内存: 8GB+ (推荐16GB+)
+- GPU显存: 4GB+ (推荐8GB+)
 
-1. **🔍 Stage 1**: Comprehensive page-level layout analysis by generating element sequence in natural reading order
-2. **🧩 Stage 2**: Efficient parallel parsing of document elements using heterogeneous anchors and task-specific prompts
-
-<div align="center">
-  <img src="./assets/framework.png" width="680">
-</div>
-
-Dolphin achieves promising performance across diverse page-level and element-level parsing tasks while ensuring superior efficiency through its lightweight architecture and parallel parsing mechanism.
-
-## 🚀 Demo
-
-Try our demo on [Demo-Dolphin](http://115.190.42.15:8888/dolphin/).
-
-
-## 📅 Changelog
-- 🔥 **2025.05.21** Our demo is released at [link](http://115.190.42.15:8888/dolphin/). Check it out!
-- 🔥 **2025.05.20** The pretrained model and inference code of Dolphin are released.
-- 🔥 **2025.05.16** Our paper has been accepted by ACL 2025. Paper link: [arXiv](https://arxiv.org/abs/2505.14059).
-
-## 🛠️ Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ByteDance/Dolphin.git
-   cd Dolphin
-   ```
-
-2. Install the dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Download the pre-trained models using one of the following options:
-
-   **Option A: Original Model Format (config-based)**
-   
-   Download from [Baidu Yun](https://pan.baidu.com/s/1EbjjTN_lUinCq7tX7hhtfQ?pwd=wb43) or [Google Drive](https://drive.google.com/drive/folders/1PQJ3UutepXvunizZEw-uGaQ0BCzf-mie?usp=sharing) and put them in the `./checkpoints` folder.
-
-   **Option B: Hugging Face Model Format**
-   
-   Visit our Huggingface [model card](https://huggingface.co/ByteDance/Dolphin), or download model by:
-   
-   ```bash
-   # Download the model from Hugging Face Hub
-   git lfs install
-   git clone https://huggingface.co/ByteDance/Dolphin ./hf_model
-   # Or use the Hugging Face CLI
-   huggingface-cli download ByteDance/Dolphin --local-dir ./hf_model
-   ```
-
-## ⚡ Inference
-
-Dolphin provides two inference frameworks with support for two parsing granularities:
-- **Page-level Parsing**: Parse the entire document image into a structured JSON and Markdown format
-- **Element-level Parsing**: Parse individual document elements (text, table, formula)
-
-### 📄 Page-level Parsing
-
-#### Using Original Framework (config-based)
+### 2. 安装依赖
 
 ```bash
-# Process a single document image
-python demo_page.py --config ./config/Dolphin.yaml --input_path ./demo/page_imgs/page_1.jpeg --save_dir ./results
+# 克隆项目
+git clone https://github.com/xDAN-AI/xDAN-smartDoc-dolphin.git
+cd xDAN-smartDoc-dolphin
 
-# Process all document images in a directory
-python demo_page.py --config ./config/Dolphin.yaml --input_path ./demo/page_imgs --save_dir ./results
+# 使用uv创建环境 (推荐)
+uv venv xdan-smartdoc
+source .venv/bin/activate  # Linux/Mac
+# 或 .venv\Scripts\activate  # Windows
 
-# Process with custom batch size for parallel element decoding
-python demo_page.py --config ./config/Dolphin.yaml --input_path ./demo/page_imgs --save_dir ./results --max_batch_size 8
+# 安装依赖
+uv pip install -e .
+
+# 或使用pip
+pip install -r requirements.txt
 ```
 
-#### Using Hugging Face Framework
+### 3. 下载模型
 
 ```bash
-# Process a single document image
-python demo_page_hf.py --model_path ./hf_model --input_path ./demo/page_imgs/page_1.jpeg --save_dir ./results
-
-# Process all document images in a directory
-python demo_page_hf.py --model_path ./hf_model --input_path ./demo/page_imgs --save_dir ./results
-
-# Process with custom batch size for parallel element decoding
-python demo_page_hf.py --model_path ./hf_model --input_path ./demo/page_imgs --save_dir ./results --max_batch_size 16
+# 下载Dolphin模型
+git lfs install
+git clone https://huggingface.co/ByteDance/Dolphin ./hf_model
 ```
 
-### 🧩 Element-level Parsing
-
-#### Using Original Framework (config-based)
+### 4. 启动服务
 
 ```bash
-# Process a single table image
-python demo_element.py --config ./config/Dolphin.yaml --input_path ./demo/element_imgs/table_1.jpeg --element_type table
+# 基本启动
+python start_xdan_vision_server.py
 
-# Process a single formula image
-python demo_element.py --config ./config/Dolphin.yaml --input_path ./demo/element_imgs/line_formula.jpeg --element_type formula
+# 指定配置
+python start_xdan_vision_server.py --port 8001 --model-path ./hf_model
 
-# Process a single text paragraph image
-python demo_element.py --config ./config/Dolphin.yaml --input_path ./demo/element_imgs/para_1.jpg --element_type text
+# 开发模式 (自动重载)
+python start_xdan_vision_server.py --dev
+
+# 多进程启动
+python start_xdan_vision_server.py --workers 4
 ```
 
-#### Using Hugging Face Framework
+### 5. 访问服务
+
+- **Web界面**: http://localhost:8000/web
+- **API文档**: http://localhost:8000/docs
+- **健康检查**: http://localhost:8000/health
+
+## 📖 使用示例
+
+### Web界面使用
+
+1. 访问 http://localhost:8000/web
+2. 拖拽或点击上传文档图片
+3. 选择输出格式和处理参数
+4. 点击"开始智能识别"
+5. 查看识别结果并下载
+
+### API调用示例
+
+#### Python客户端
+
+```python
+import httpx
+import asyncio
+
+async def process_document():
+    async with httpx.AsyncClient() as client:
+        # 上传文档
+        with open("document.png", "rb") as f:
+            files = {"file": ("document.png", f, "image/png")}
+            data = {
+                "output_format": "structured",
+                "max_batch_size": 16,
+                "include_confidence": True
+            }
+            
+            response = await client.post(
+                "http://localhost:8000/api/process/document",
+                files=files,
+                data=data
+            )
+            
+        result = response.json()
+        print(f"识别到 {result['total_elements']} 个元素")
+        print(f"处理时间: {result['processing_time']:.2f}s")
+
+asyncio.run(process_document())
+```
+
+#### cURL调用
 
 ```bash
-# Process a single table image
-python demo_element_hf.py --model_path ./hf_model --input_path ./demo/element_imgs/table_1.jpeg --element_type table
+# 处理文档
+curl -X POST "http://localhost:8000/api/process/document" \
+     -H "Content-Type: multipart/form-data" \
+     -F "file=@document.png" \
+     -F "output_format=structured" \
+     -F "max_batch_size=16"
 
-# Process a single formula image
-python demo_element_hf.py --model_path ./hf_model --input_path ./demo/element_imgs/line_formula.jpeg --element_type formula
-
-# Process a single text paragraph image
-python demo_element_hf.py --model_path ./hf_model --input_path ./demo/element_imgs/para_1.jpg --element_type text
+# 健康检查
+curl "http://localhost:8000/health"
 ```
 
-## 🌟 Key Features
+## 📊 输出格式
 
-- 🔄 Two-stage analyze-then-parse approach based on a single VLM
-- 📊 Promising performance on document parsing tasks
-- 🔍 Natural reading order element sequence generation
-- 🧩 Heterogeneous anchor prompting for different document elements
-- ⏱️ Efficient parallel parsing mechanism
-- 🤗 Support for Hugging Face Transformers for easier integration
-
-
-## 📮 Notice
-**Call for Bad Cases:** If you have encountered any cases where the model performs poorly, we would greatly appreciate it if you could share them in the issue.
-
-## 💖 Acknowledgement
-
-We would like to acknowledge the following open-source projects that provided inspiration and reference for this work:
-- [Donut](https://github.com/clovaai/donut/)
-- [Nougat](https://github.com/facebookresearch/nougat)
-- [GOT](https://github.com/Ucas-HaoranWei/GOT-OCR2.0)
-- [MinerU](https://github.com/opendatalab/MinerU/tree/master)
-- [Swin](https://github.com/microsoft/Swin-Transformer)
-- [Hugging Face Transformers](https://github.com/huggingface/transformers)
-
-## 📝 Citation
-
-If you find this code useful for your research, please use the following BibTeX entry.
-
-```bibtex
-@inproceedings{dolphin2025,
-  title={Dolphin: Document Image Parsing via Heterogeneous Anchor Prompting},
-  author={Feng, Hao and Wei, Shu and Fei, Xiang and Shi, Wei and Han, Yingdong and Liao, Lei and Lu, Jinghui and Wu, Binghong and Liu, Qi and Lin, Chunhui and Tang, Jingqun and Liu, Hao and Huang, Can},
-  year={2025},
-  booktitle={Proceedings of the 65rd Annual Meeting of the Association for Computational Linguistics (ACL)}
+### JSON格式 - 程序处理
+```json
+{
+  "task_id": "uuid",
+  "total_elements": 15,
+  "processing_time": 3.45,
+  "elements": [
+    {
+      "element_id": "elem_001",
+      "type": "text",
+      "bbox": [100, 200, 500, 250],
+      "text": "识别的文本内容",
+      "confidence": 0.98,
+      "reading_order": 1
+    }
+  ]
 }
 ```
 
-## Star History
+### Markdown格式 - 可读文档
+```markdown
+# 文档标题
 
-[![Star History Chart](https://api.star-history.com/svg?repos=bytedance/Dolphin&type=Date)](https://www.star-history.com/#bytedance/Dolphin&Date)
+## 章节内容
+
+识别的文本内容...
+
+| 列1 | 列2 | 列3 |
+|-----|-----|-----|
+| 数据1 | 数据2 | 数据3 |
+
+$$E = mc^2$$
+```
+
+### HTML格式 - 网页显示
+完整的HTML文档，支持样式和置信度可视化。
+
+### 结构化格式 - 全格式输出
+同时包含JSON、Markdown和HTML格式的完整结果。
+
+## ⚙️ 配置选项
+
+### 环境变量
+
+```bash
+# 模型配置
+export MODEL_PATH="./hf_model"
+export DEVICE="cuda"  # 或 "cpu"
+
+# Redis缓存 (可选)
+export REDIS_URL="redis://localhost:6379/0"
+
+# 日志级别
+export LOG_LEVEL="INFO"
+```
+
+### 处理参数
+
+- `max_batch_size`: 批处理大小 (1-64)，影响处理速度
+- `output_format`: 输出格式 (json/markdown/html/structured)
+- `include_confidence`: 是否包含置信度
+- `include_coordinates`: 是否包含坐标信息
+- `merge_text_blocks`: 是否合并相邻文本块
+
+## 🎯 性能优化建议
+
+### 批处理大小选择
+- **小文档**: batch_size = 32 (快速处理)
+- **大文档**: batch_size = 8 (高精度)
+- **内存受限**: batch_size = 4 (节省显存)
+
+### GPU配置
+```bash
+# 指定GPU设备
+export CUDA_VISIBLE_DEVICES=0
+
+# 启用GPU加速
+export DEVICE=cuda
+```
+
+## 📁 项目结构
+
+```
+xDAN-smartDoc-dolphin/
+├── demo_*.py                    # 原始演示脚本
+├── start_xdan_vision_server.py  # 主启动脚本
+├── chat.py                      # 聊天界面脚本
+├── src/                         # 核心源码
+│   ├── api/                     # API服务
+│   ├── core/                    # 核心配置
+│   ├── engines/                 # 处理引擎
+│   ├── utils/                   # 工具函数
+│   └── web/                     # Web界面
+├── docs/                        # 技术文档
+│   ├── API_USAGE_GUIDE.md       # API使用指南
+│   ├── DEPLOYMENT_GUIDE.md      # 部署指南
+│   ├── VISION_ANALYSIS.md       # 视觉分析文档
+│   └── README_ARCHITECTURE.md   # 架构说明
+├── tests/                       # 测试文件
+├── examples/                    # 示例代码
+└── scripts/                     # 工具脚本
+```
+
+## 🔧 原始Demo脚本
+
+项目保留了原始的Dolphin demo脚本，可以直接使用：
+
+```bash
+# 页面级文档处理
+python demo_page_hf.py --input_path document.png --model_path ./hf_model
+
+# 元素级处理
+python demo_element_hf.py --input_path element.png --element_type text
+
+# 交互式聊天
+python chat.py --model_path ./hf_model
+```
+
+## 📚 文档链接
+
+- 📖 [API使用指南](docs/API_USAGE_GUIDE.md)
+- 🚀 [部署指南](docs/DEPLOYMENT_GUIDE.md)
+- 🏗️ [系统架构](docs/README_ARCHITECTURE.md)
+- 🔍 [视觉分析](docs/VISION_ANALYSIS.md)
+- ⚡ [快速开始](QUICK_START.md)
+
+## 🤝 贡献
+
+欢迎提交Issue和Pull Request！
+
+### 开发环境设置
+
+```bash
+# 安装开发依赖
+uv pip install -e ".[dev]"
+
+# 代码格式化
+black src/
+isort src/
+
+# 类型检查
+mypy src/
+
+# 运行测试
+pytest tests/
+```
+
+## 📄 许可证
+
+本项目使用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
+
+## 🏷️ 版本历史
+
+- **v2.0.0** - xDAN重构版本，企业级API服务
+- **v1.0.0** - 基于Dolphin的基础版本
+
+---
+
+**xDAN-Vision-SmartDoc** - 让智能文档识别更简单高效！ 🚀
