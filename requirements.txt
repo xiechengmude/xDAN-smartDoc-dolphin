@@ -30,3 +30,5 @@ orjson>=3.10.0
 ujson>=5.10.0
 # Security
 itsdangerous>=2.2.0
+# Logging
+structlog>=23.2.0
